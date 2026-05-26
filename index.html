@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poolhouse — Data Analytics</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0f0f0f; }
+
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
+    .dv-wrap { background: #0f0f0f; padding: 48px 32px; font-family: 'DM Sans', sans-serif; color: #e8e4dc; }
+    .dv-section-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #d4a853; margin-bottom: 32px; display: flex; align-items: center; gap: 10px; }
+    .dv-section-label::after { content: ''; flex: 1; height: 0.5px; background: rgba(212,168,83,0.25); }
+    .dv-subsection { margin-bottom: 48px; }
+    .dv-chart-title { font-family: 'Playfair Display', serif; font-size: 20px; color: #f0ece4; margin-bottom: 4px; font-weight: 700; }
+    .dv-chart-sub { font-size: 13px; color: rgba(232,228,220,0.45); margin-bottom: 24px; line-height: 1.5; }
+    .dv-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; }
+    .dv-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: rgba(232,228,220,0.6); }
+    .dv-legend-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+    .dv-stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(255,255,255,0.06); margin-bottom: 32px; }
+    .dv-stat-cell { background: #0f0f0f; padding: 20px 16px; }
+    .dv-stat-val { font-family: 'Playfair Display', serif; font-size: 28px; color: #d4a853; line-height: 1; margin-bottom: 4px; }
+    .dv-stat-lbl { font-size: 11px; color: rgba(232,228,220,0.4); line-height: 1.4; }
+    .dv-tools-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; padding-top: 24px; border-top: 0.5px solid rgba(255,255,255,0.06); }
+    .dv-tool-tag { font-size: 11px; letter-spacing: 0.1em; padding: 6px 14px; border: 0.5px solid rgba(212,168,83,0.35); color: #d4a853; border-radius: 100px; }
+    .dv-divider { height: 0.5px; background: rgba(255,255,255,0.06); margin: 40px 0; }
+    .dv-annotation { font-size: 12px; color: rgba(212,168,83,0.7); font-style: italic; margin-top: 12px; padding-left: 12px; border-left: 2px solid rgba(212,168,83,0.25); }
+
+    @media (max-width: 600px) {
+      .dv-stat-row { grid-template-columns: repeat(2, 1fr); }
+      .dv-wrap { padding: 32px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="dv-wrap">
+
+  <div class="dv-section-label">
+    Data analytics — visualized
+  </div>
+
+  <div class="dv-stat-row">
+    <div class="dv-stat-cell">
+      <div class="dv-stat-val">59.6%</div>
+      <div class="dv-stat-lbl">Churn rate (30-day window)</div>
+    </div>
+    <div class="dv-stat-cell">
+      <div class="dv-stat-val">60.6%</div>
+      <div class="dv-stat-lbl">Low-engagement users (1–5 sessions)</div>
+    </div>
+    <div class="dv-stat-cell">
+      <div class="dv-stat-val">49.6</div>
+      <div class="dv-stat-lbl">Mean sessions (skewed by outliers)</div>
+    </div>
+    <div class="dv-stat-cell">
+      <div class="dv-stat-val">1</div>
+      <div class="dv-stat-lbl">Median sessions — the real story</div>
+    </div>
+  </div>
+
+  <div class="dv-subsection">
+    <div class="dv-chart-title">Session distribution across all users</div>
+    <div class="dv-chart-sub">Right-skewed distribution — the vast majority of users had 1–10 sessions, while a small cohort of power users drove the inflated mean. SD = 127.27.</div>
+    <div class="dv-legend">
+      <span class="dv-legend-item"><span class="dv-legend-swatch" style="background:#d4a853"></span>Low engagement (1–5 sessions) — 60.6%</span>
+      <span class="dv-legend-item"><span class="dv-legend-swatch" style="background:#6b8f71"></span>Active users (6–100 sessions)</span>
+      <span class="dv-legend-item"><span class="dv-legend-swatch" style="background:#4a7fa5"></span>Power users (100+ sessions)</span>
+    </div>
+    <div style="position:relative;width:100%;height:240px;">
+      <canvas id="sessionDist" role="img" aria-label="Bar chart showing session distribution. The vast majority of users had 1-10 sessions, with very few reaching 100 or more."></canvas>
+    </div>
+    <p class="dv-annotation">Median of 1 vs. mean of 49.6 — a gap that reveals the data cleaning challenge: outliers required careful handling to avoid misrepresenting typical user behavior.</p>
+  </div>
+
+  <div class="dv-divider"></div>
+
+  <div class="dv-subsection">
+    <div class="dv-chart-title">Engagement tier breakdown</div>
+    <div class="dv-chart-sub">Users segmented into three behavioral groups. The low-engagement majority (60.6%) was the primary churn driver.</div>
+    <div class="dv-legend">
+      <span class="dv-legend-item"><span class="dv-legend-swatch" style="background:#d4a853"></span>Low (1–5 sessions) 60.6%</span>
+      <span class="dv-legend-item"><span class="dv-legend-swatch" style="background:#6b8f71"></span>Active (6–100) 30.4%</span>
+      <span class="dv-legend-item"><span class="dv-legend-swatch" style="background:#4a7fa5"></span>Power (100+) 9%</span>
+    </div>
+    <div style="position:relative;width:100%;height:260px;">
+      <canvas id="engagementDonut" role="img" aria-label="Donut chart showing user engagement tiers. Low engagement 60.6%, Active 30.4%, Power users 9%."></canvas>
+    </div>
+  </div>
+
+  <div class="dv-divider"></div>
+
+  <div class="dv-subsection">
+    <div class="dv-chart-title">Churn vs. retained — 30-day window</div>
+    <div class="dv-chart-sub">Nearly 3 in 5 users were classified as churned (inactive for 30+ days). Cross-referenced against engagement tier to identify which segments were most at-risk.</div>
+    <div class="dv-legend">
+      <span class="dv-legend-item"><span class="dv-legend-swatch" style="background:#c0392b"></span>Churned 59.6%</span>
+      <span class="dv-legend-item"><span class="dv-legend-swatch" style="background:#6b8f71"></span>Retained 40.4%</span>
+    </div>
+    <div style="position:relative;width:100%;height:100px;">
+      <canvas id="churnBar" role="img" aria-label="Horizontal stacked bar showing 59.6% churned users in red and 40.4% retained users in green."></canvas>
+    </div>
+    <p class="dv-annotation">Churn defined as no platform activity in the prior 30 days. Calculated from backend first-seen / last-seen timestamps after cleaning irregular export fields.</p>
+  </div>
+
+  <div class="dv-tools-row">
+    <span style="font-size:11px; color:rgba(232,228,220,0.3); letter-spacing:0.1em; text-transform:uppercase; align-self:center; margin-right:4px;">Tools used</span>
+    <span class="dv-tool-tag">Python</span>
+    <span class="dv-tool-tag">Pandas</span>
+    <span class="dv-tool-tag">Data cleaning & wrangling</span>
+    <span class="dv-tool-tag">Statistical analysis</span>
+    <span class="dv-tool-tag">Survey design</span>
+    <span class="dv-tool-tag">User interviews</span>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const amber = '#d4a853';
+const green = '#6b8f71';
+const blue = '#4a7fa5';
+const red = '#c0392b';
+const gridColor = 'rgba(255,255,255,0.06)';
+const tickColor = 'rgba(232,228,220,0.35)';
+
+new Chart(document.getElementById('sessionDist'), {
+  type: 'bar',
+  data: {
+    labels: ['1','2','3','4','5','6-10','11-25','26-50','51-100','101-200','200+'],
+    datasets: [{
+      label: 'Users',
+      data: [62, 19, 10, 7, 5, 14, 9, 5, 4, 3, 2],
+      backgroundColor: [amber, amber, amber, amber, amber, green, green, green, green, blue, blue],
+      borderColor: [amber, amber, amber, amber, amber, green, green, green, green, blue, blue],
+      borderWidth: 1
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      backgroundColor: '#1a1a1a',
+      titleColor: '#e8e4dc',
+      bodyColor: 'rgba(232,228,220,0.6)',
+      borderColor: 'rgba(255,255,255,0.1)',
+      borderWidth: 1,
+      callbacks: { label: ctx => ' ' + ctx.parsed.y + ' users' }
+    }},
+    scales: {
+      x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 } } },
+      y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 } }, title: { display: true, text: 'number of users', color: tickColor, font: { size: 11 } } }
+    }
+  }
+});
+
+new Chart(document.getElementById('engagementDonut'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Low (1–5 sessions)', 'Active (6–100)', 'Power (100+)'],
+    datasets: [{
+      data: [60.6, 30.4, 9],
+      backgroundColor: [amber, green, blue],
+      borderColor: '#0f0f0f',
+      borderWidth: 3,
+      hoverOffset: 4
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '68%',
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1a1a1a',
+        titleColor: '#e8e4dc',
+        bodyColor: 'rgba(232,228,220,0.6)',
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 1,
+        callbacks: { label: ctx => ' ' + ctx.parsed.toFixed(1) + '%' }
+      }
+    }
+  }
+});
+
+new Chart(document.getElementById('churnBar'), {
+  type: 'bar',
+  data: {
+    labels: ['Users'],
+    datasets: [
+      { label: 'Churned', data: [59.6], backgroundColor: red, borderColor: red, borderWidth: 1 },
+      { label: 'Retained', data: [40.4], backgroundColor: green, borderColor: green, borderWidth: 1 }
+    ]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1a1a1a',
+        titleColor: '#e8e4dc',
+        bodyColor: 'rgba(232,228,220,0.6)',
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 1,
+        callbacks: { label: ctx => ' ' + ctx.parsed.x.toFixed(1) + '%' }
+      }
+    },
+    scales: {
+      x: { stacked: true, grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 11 }, callback: v => v + '%' }, max: 100 },
+      y: { stacked: true, grid: { display: false }, ticks: { display: false } }
+    }
+  }
+});
+</script>
+
+</body>
+</html>
